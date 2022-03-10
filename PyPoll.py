@@ -7,7 +7,6 @@
 # Add dependencies
 import csv
 import os
-from telnetlib import theNULL
 
 # Create a filename variable to load a file from direct path
 election_file = 'Resources/election_results.csv'
@@ -28,7 +27,7 @@ winning_percentage = 0
 with open(election_file) as election_data:
     # Reference the file object in memory
     file_reader = csv.reader(election_data)
-    # Create headers & read header row
+    # Create headers & read (skip) header row
     headers = next(file_reader)
     # Print each row in the csv file
     for row in file_reader:
@@ -48,26 +47,39 @@ with open(election_file) as election_data:
 #print(candidate_options)
 #print(candidate_votes)
 
-# Calculate percentage of votes
-# Iterate through the 'list' of candidates to calculate vote counts--this looping through our dictionary
-for candidate_name in candidate_votes:
-    # Declare votes for a candidate-- breaking out the value in the KVP
-    votes = candidate_votes[candidate_name]
-    # Calculate vote percentage--module wanted to pass through float but unnecessary, see below
-    vote_percentage = votes / total_votes *100
-    # print(type(vote_percentage))
-    # print(f'{candidate_name} received {vote_percentage:.1f}% of the vote.')
-    print(f'{candidate_name}: {vote_percentage:.1f}% ({votes:,})\n')
-    # Determine the winner
-    if (votes > winning_count) and (vote_percentage > winning_percentage):
-        winning_candidate = candidate_name
-        winning_count = votes
-        winning_percentage = vote_percentage
-winning_candidate_summary = (
-    f"------------------------\n"
-    f"Winner: {winning_candidate}\n"
-    f"Winning Vote Count: {winning_count:,}\n"
-    f"Winning Vote Percentage: {winning_percentage:.1f}%\n"
-    f"--------------------------\n")
-print(winning_candidate_summary)
-
+# Open election results and WRITE results file:
+# Save the results to our txt file:
+with open(election_notes,"w") as election_analysis:
+    election_results = (
+        f"\nElection Results\n"
+        f"-----------------------\n"
+        f"Total Votes: {total_votes:,}\n"
+        f"-----------------------\n")
+    print(election_results, end='')
+    election_analysis.write(election_results)
+    # Calculate percentage of votes
+    # Iterate through the 'list' of candidates to calculate vote counts--this looping through our dictionary
+    for candidate_name in candidate_votes:
+        # Declare votes for a candidate-- breaking out the value in the KVP
+        votes = candidate_votes[candidate_name]
+        # Calculate vote percentage--module wanted to pass through float but unnecessary, see below
+        vote_percentage = votes / total_votes *100
+        # print(type(vote_percentage))
+        # print(f'{candidate_name} received {vote_percentage:.1f}% of the vote.')
+        candidate_results = (f'{candidate_name}: {vote_percentage:.1f}% ({votes:,})\n')
+        print(candidate_results,end="")
+        election_analysis.write(candidate_results)
+        # Determine the winner
+        if (votes > winning_count) and (vote_percentage > winning_percentage):
+            winning_candidate = candidate_name
+            winning_count = votes
+            winning_percentage = vote_percentage
+    winning_candidate_summary = (
+        f"------------------------\n"
+        f"Winner: {winning_candidate}\n"
+        f"Winning Vote Count: {winning_count:,}\n"
+        f"Winning Vote Percentage: {winning_percentage:.1f}%\n"
+        f"--------------------------\n")
+    # print(winning_candidate_summary)
+    print(winning_candidate_summary, end='')
+    election_analysis.write(winning_candidate_summary)
